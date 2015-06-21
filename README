@@ -1,0 +1,26 @@
+This is a mirror of http://www.vim.org/scripts/script.php?script_id=5203
+
+A simple asynchronous complete plugin, it will run simply and silently in background :)
+
+Depends:
+ - vim 7.3.196 or later
+ - +python feature
+ - +clientserver feature (optional)
+
+ * asynccompl only supports ASCII completion of the current buffer currently
+
+Options:
+ * g:asynccompl_autostart_filetype  default: ['all']
+    asynccompl will autostart in these filetype, and the 'all' means always start
+
+ * g:asynccompl_autostop_filetype   default: []
+    asynccompl will stop in these filetype
+
+Suggestions:
+ - If you wish always start asynccompl, just not need to configure.
+
+ - If you wish just start asynccompl in c, cpp filetype, just add the follow to your .vimrc
+    let g:asynccompl_autostart_filetype = ['c', 'cpp']
+
+ - If you wish just stop asynccompl in c, cpp filetype, just add the follow to your .vimrc
+    let g:asynccompl_autostop_filetype = ['c', 'cpp']
