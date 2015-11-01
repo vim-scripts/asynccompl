@@ -27,14 +27,14 @@ if !exists('##InsertCharPre')
 endif
 
 " 版本号 1001 -> 1.001
-let s:version = "0.100"
+let s:version = "0.110"
 
 " 全局使用 - 正向选择全部
 " 仅某些类型使用
 "       - 正向选择(优先)
 "       - 反向选择
 let g:asynccompl_autostart_filetype =
-        \ get(g:, 'asynccompl_autostart_filetype', ['all'])
+        \ get(g:, 'asynccompl_autostart_filetype', ['__ALL__'])
 let g:asynccompl_autostop_filetype =
         \ get(g:, 'asynccompl_autostop_filetype', [])
 
@@ -45,8 +45,13 @@ function! s:InitKeywordsComplete() "{{{2
         return
     endif
 
-    if index(g:asynccompl_autostart_filetype, 'all') >= 0 || empty(&ft)
-        " nothing to be done
+    if index(g:asynccompl_autostart_filetype, '__ALL__') >= 0
+        " __ALL__ 需要特殊处理, 需要检查 g:asynccompl_autostop_filetype
+        if index(g:asynccompl_autostop_filetype, &ft) >= 0
+            return
+        else
+            " nothing to be done
+        endif
     elseif index(g:asynccompl_autostart_filetype, &ft) >= 0
         " nothing to be done
     elseif index(g:asynccompl_autostop_filetype, &ft) >= 0
@@ -76,8 +81,10 @@ function! s:InitKeywordsComplete() "{{{2
     py del __kw_pat
     call asynccompl#BuffInit()
 
-    command! -nargs=0 AsyncComplBuffInit call asynccompl#BuffInit()
-    command! -nargs=0 AsyncComplBuffExit call asynccompl#BuffExit()
+    if exists(':AsyncComplBuffExit') != 2
+        command! -nargs=0 AsyncComplBuffInit call asynccompl#BuffInit()
+        command! -nargs=0 AsyncComplBuffExit call asynccompl#BuffExit()
+    endif
 endfunction
 "}}}
 
@@ -131,5 +138,8 @@ augroup AsyncComplStart
     autocmd!
     autocmd BufNewFile,BufReadPost * call <SID>InitKeywordsComplete()
 augroup END
+
+" 初始的触发命令, 跟之后的是有区别的
+command! -nargs=0 AsyncComplBuffInit call <SID>InitKeywordsComplete()
 
 " vim: fdm=marker fen et sw=4 sts=4 fdl=1
